@@ -1,4 +1,17 @@
+import { useFamily } from '../contexts/FamilyContext'
+
 export default function ActivityTable() {
+  const { entries } = useFamily()
+
+  const displayEntries =
+    entries.length > 0
+      ? entries
+      : [
+          { id: 'seed-1', member: 'אמא', item: 'אכלתי וופל', sugar: 12, calories: 180 },
+          { id: 'seed-2', member: 'אבא', item: 'יוגורט טבעי', sugar: 4, calories: 120 },
+          { id: 'seed-3', member: 'נועה', item: 'תפוח עץ', sugar: 0, calories: 95 },
+        ]
+
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between px-1">
@@ -17,30 +30,22 @@ export default function ActivityTable() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            <tr className="hover:bg-slate-50">
-              <td className="px-5 py-4 font-semibold">אמא</td>
-              <td className="px-5 py-4 text-sm text-slate-600">אכלתי וופל</td>
-              <td className="px-5 py-4 text-center">
-                <span className="rounded-md bg-red-50 px-2.5 py-1 text-sm font-bold text-red-600">12</span>
-              </td>
-              <td className="px-5 py-4 text-center text-sm font-medium">180</td>
-            </tr>
-            <tr className="hover:bg-slate-50">
-              <td className="px-5 py-4 font-semibold">אבא</td>
-              <td className="px-5 py-4 text-sm text-slate-600">יוגורט טבעי</td>
-              <td className="px-5 py-4 text-center">
-                <span className="rounded-md bg-green-50 px-2.5 py-1 text-sm font-bold text-green-700">4</span>
-              </td>
-              <td className="px-5 py-4 text-center text-sm font-medium">120</td>
-            </tr>
-            <tr className="hover:bg-slate-50">
-              <td className="px-5 py-4 font-semibold">נועה</td>
-              <td className="px-5 py-4 text-sm text-slate-600">תפוח עץ</td>
-              <td className="px-5 py-4 text-center">
-                <span className="rounded-md bg-green-50 px-2.5 py-1 text-sm font-bold text-green-700">0*</span>
-              </td>
-              <td className="px-5 py-4 text-center text-sm font-medium">95</td>
-            </tr>
+            {displayEntries.map((entry) => (
+              <tr key={entry.id} className="hover:bg-slate-50">
+                <td className="px-5 py-4 font-semibold">{entry.member}</td>
+                <td className="px-5 py-4 text-sm text-slate-600">{entry.item}</td>
+                <td className="px-5 py-4 text-center">
+                  <span
+                    className={`rounded-md px-2.5 py-1 text-sm font-bold ${
+                      entry.sugar > 10 ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'
+                    }`}
+                  >
+                    {entry.sugar}
+                  </span>
+                </td>
+                <td className="px-5 py-4 text-center text-sm font-medium">{entry.calories}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
