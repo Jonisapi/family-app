@@ -1,0 +1,3 @@
+export default function Goals() {
+  return <h1 className="p-6 text-2xl font-bold">יעדים</h1>
+}
