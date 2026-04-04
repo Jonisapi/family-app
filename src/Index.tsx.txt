@@ -1,0 +1,134 @@
+export default function Index() {
+  return (
+    <div dir="rtl" className="min-h-screen bg-slate-50 pb-24 text-slate-800">
+      {/* Top App Bar */}
+      <header className="sticky top-0 z-50 flex w-full items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 overflow-hidden rounded-full border border-slate-200">
+            <img
+              className="h-full w-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuALXLExX8mPTj8Vn64fNOLQWiLD5OZzYwl6WdsWCapEiAjxgHyWeVHVe5GdqugmzY-iENNEM0tp4-4gPyg9tw-__0NzC-q10dKIVLAMFP0Q2lJGYs5WIDRNwGorTa8oCldHZeM8sjQREAnALhpktLAU_CEd5Oe9b0GMwX1vq_dVxP4DHyXI5U-J9UQUeiGgCK5nmaNRXCF0ojNq40ivY3Eoo6nHEghfXt-WMSSgc3fz8q_fhnaV83nxplVvC0oukDNBbxS0AMgMtvU"
+              alt="Family avatar"
+            />
+          </div>
+          <h1 className="text-lg font-bold tracking-tight">משפחת כהן</h1>
+        </div>
+        <button className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100" aria-label="Notifications">
+          🔔
+        </button>
+      </header>
+
+      <main className="mx-auto max-w-4xl space-y-8 px-6 py-8">
+        {/* Progress Metrics */}
+        <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500">סיכום שבועי</h2>
+              <p className="mt-1 text-2xl font-extrabold">בדרך ליעד המשפחתי</p>
+            </div>
+            <span className="text-3xl font-black text-green-700">68%</span>
+          </div>
+
+          <div className="space-y-2">
+            <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200">
+              <div className="h-full w-[68%] rounded-full bg-green-700" />
+            </div>
+            <div className="flex justify-between text-xs font-semibold text-slate-500">
+              <span>נשארו עוד 120 גרם</span>
+              <span>יעד: 400 גרם סוכר</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Achievement Highlight */}
+        <section className="rounded-xl bg-green-700 p-6 text-white shadow-md">
+          <div className="flex flex-col items-center gap-5 sm:flex-row">
+            <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-white/30">
+              <img
+                className="h-full w-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzOaFNEpHQIDa5C16Cv8B7TGFwp3m1JQD7C51atU-lRRlHGIqyl2zvTeH50nYOtXby-CK7KsDwlGjkMkRCTc9wEEncntv4_8ANFGyybDhyAgh_aaT1qJkh0MUbQXdrtE7M_yiHxZvlA-gaCkSv-iatcicxDZdsIQcakjpnfbpzJCXxJVRQmMSWmYrmul7j7Alg1z7ujld1xN2ycJ4Bo_m5snbkCgyT8Wj2OXuoRp_4tCYoarxqRZhARAt1_iSAdMlNzOgDhdsv1p0"
+                alt="Highlight of the day"
+              />
+            </div>
+            <div className="flex-1 text-center sm:text-right">
+              <h3 className="text-xl font-bold">הישג היום: יונתן</h3>
+              <p className="mt-1 text-sm text-white/90">שמר על רף 0 גרם סוכר מוסף היום. עבודה מצוינת!</p>
+            </div>
+            <button className="rounded-lg border border-white/20 bg-white/15 px-5 py-2.5 text-sm font-bold transition hover:bg-white/25">
+              כל הכבוד
+            </button>
+          </div>
+        </section>
+
+        {/* Activity Log */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <h3 className="text-xl font-bold">יומן פעילות</h3>
+            <span className="rounded-md bg-green-100 px-3 py-1.5 text-xs font-bold text-green-700">היום</span>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <table className="w-full border-collapse text-right">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-100 text-[11px] font-black uppercase tracking-wider text-slate-500">
+                  <th className="px-5 py-4">בן משפחה</th>
+                  <th className="px-5 py-4">פריט</th>
+                  <th className="px-5 py-4 text-center">סוכר (ג׳)</th>
+                  <th className="px-5 py-4 text-center">קלוריות</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                <tr className="hover:bg-slate-50">
+                  <td className="px-5 py-4 font-semibold">אמא</td>
+                  <td className="px-5 py-4 text-sm text-slate-600">אכלתי וופל</td>
+                  <td className="px-5 py-4 text-center">
+                    <span className="rounded-md bg-red-50 px-2.5 py-1 text-sm font-bold text-red-600">12</span>
+                  </td>
+                  <td className="px-5 py-4 text-center text-sm font-medium">180</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50">
+                  <td className="px-5 py-4 font-semibold">אבא</td>
+                  <td className="px-5 py-4 text-sm text-slate-600">יוגורט טבעי</td>
+                  <td className="px-5 py-4 text-center">
+                    <span className="rounded-md bg-green-50 px-2.5 py-1 text-sm font-bold text-green-700">4</span>
+                  </td>
+                  <td className="px-5 py-4 text-center text-sm font-medium">120</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50">
+                  <td className="px-5 py-4 font-semibold">נועה</td>
+                  <td className="px-5 py-4 text-sm text-slate-600">תפוח עץ</td>
+                  <td className="px-5 py-4 text-center">
+                    <span className="rounded-md bg-green-50 px-2.5 py-1 text-sm font-bold text-green-700">0*</span>
+                  </td>
+                  <td className="px-5 py-4 text-center text-sm font-medium">95</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p className="px-1 text-[10px] leading-relaxed text-slate-500">
+            * פירות מכילים סוכר טבעי שאינו נספר במכסה המעובדת היומית.
+          </p>
+        </section>
+      </main>
+
+      {/* Bottom Nav */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-slate-200 bg-white p-3">
+        <a className="text-sm font-bold text-green-700" href="#">
+          בית
+        </a>
+        <a className="text-sm font-bold text-slate-500 hover:text-green-700" href="#">
+          הוספה
+        </a>
+        <a className="text-sm font-bold text-slate-500 hover:text-green-700" href="#">
+          יעדים
+        </a>
+        <a className="text-sm font-bold text-slate-500 hover:text-green-700" href="#">
+          משפחה
+        </a>
+      </nav>
+    </div>
+  )
+}
