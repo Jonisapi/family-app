@@ -1,27 +1,113 @@
+import { FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFamily } from '../contexts/FamilyContext'
+import type { Member } from '../contexts/FamilyContext'
 
 export default function Onboarding() {
   const navigate = useNavigate()
   const { setFamilyName, setMembers } = useFamily()
 
-  function handleStart() {
-    setFamilyName('משפחת כהן')
-    setMembers(['אמא', 'אבא', 'נועה'])
+  const [familyNameInput, setFamilyNameInput] = useState('')
+  const [memberInput, setMemberInput] = useState('')
+  const [draftMembers, setDraftMembers] = useState<Member[]>([])
+
+  function addMember() {
+    const name = memberInput.trim()
+    if (!name) return
+
+    setDraftMembers((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        name,
+      },
+    ])
+    setMemberInput('')
+  }
+
+  function removeMember(id: string) {
+    setDraftMembers((prev) => prev.filter((m) => m.id !== id))
+  }
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+
+    const familyName = familyNameInput.trim()
+    if (!familyName) {
+      alert('נא להזין שם משפחה')
+      return
+    }
+
+    if (draftMembers.length === 0) {
+      alert('נא להוסיף לפחות בן משפחה אחד')
+      return
+    }
+
+    setFamilyName(familyName)
+    setMembers(draftMembers)
     navigate('/', { replace: true })
   }
 
   return (
-    <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">אונבורדינג</h1>
-      <p className="mb-4 text-slate-600">לחץ כדי ליצור משפחה לדוגמה ולהמשיך.</p>
-      <button
-        type="button"
-        onClick={handleStart}
-        className="rounded-lg bg-green-700 px-4 py-2 text-white"
-      >
-        התחל
-      </button>
+    <div dir="rtl" className="mx-auto max-w-xl p-6">
+      <h1 className="mb-6 text-2xl font-bold">אונבורדינג</h1>
+
+      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div>
+          <label className="mb-1 block text-sm font-semibold text-slate-700">שם משפחה</label>
+          <input
+            value={familyNameInput}
+            onChange={(e) => setFamilyNameInput(e.target.value)}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2"
+            placeholder="לדוגמה: משפחת כהן"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-semibold text-slate-700">הוספת בן משפחה</label>
+          <div className="flex gap-2">
+            <input
+              value={memberInput}
+              onChange={(e) => setMemberInput(e.target.value)}
+              className="flex-1 rounded-lg border border-slate-300 px-3 py-2"
+              placeholder="שם בן משפחה"
+            />
+            <button
+              type="button"
+              onClick={addMember}
+              className="rounded-lg bg-slate-200 px-4 py-2 font-semibold"
+            >
+              הוסף
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-slate-700">בני משפחה</p>
+          {draftMembers.length === 0 ? (
+            <p className="text-sm text-slate-500">עדיין לא הוספת בני משפחה</p>
+          ) : (
+            <ul className="space-y-2">
+              {draftMembers.map((m) => (
+                <li key={m.id} className="flex items-center justify-between rounded-lg bg-slate-100 px-3 py-2">
+                  <span className="font-medium">{m.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeMember(m.id)}
+                    className="rounded bg-red-100 px-2 py-1 text-xs text-red-700"
+                  >
+                    הסר
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <button type="submit" className="w-full rounded-lg bg-green-700 px-4 py-2 font-bold text-white">
+          שמירה והמשך
+        </button>
+      </form>
     </div>
   )
 }
