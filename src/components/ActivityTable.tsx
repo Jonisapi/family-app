@@ -1,207 +1,97 @@
 import { useState } from 'react'
 import { useFamily } from '../contexts/FamilyContext'
-import type { ActivityEntry } from '../contexts/FamilyContext'
 
 export default function ActivityTable() {
-  const { entries, updateEntry, deleteEntry, members } = useFamily()
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [draft, setDraft] = useState<Omit<ActivityEntry, 'id'> | null>(null)
+  const { entries, deleteEntry } = useFamily()
+  const [filter, setFilter] = useState<'today' | 'all'>('today')
 
-  const displayEntries = entries
+  const today = new Date().toISOString().slice(0, 10)
 
-  function startEdit(entry: ActivityEntry) {
-    setEditingId(entry.id)
-    setDraft({
-      memberId: entry.memberId,
-      memberName: entry.memberName,
-      item: entry.item,
-      sugar: entry.sugar,
-      calories: entry.calories,
-    })
-  }
-
-  function cancelEdit() {
-    setEditingId(null)
-    setDraft(null)
-  }
-
-  function saveEdit(id: string) {
-    if (!draft) return
-    if (!draft.memberName.trim() || !draft.item.trim()) return
-
-    updateEntry(id, {
-      memberId: draft.memberId,
-      memberName: draft.memberName.trim(),
-      item: draft.item.trim(),
-      sugar: Number(draft.sugar),
-      calories: Number(draft.calories),
-    })
-    cancelEdit()
-  }
+  const filtered = filter === 'today'
+    ? entries.filter((e) => e.date === today)
+    : entries
 
   return (
-    <section className="space-y-3">
-      <div className="flex items-center justify-between px-1">
-        <h3 className="text-xl font-bold">יומן פעילות</h3>
-        <span className="rounded-md bg-green-100 px-3 py-1.5 text-xs font-bold text-green-700">היום</span>
+    <section className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+        <h2 className="text-base font-bold text-slate-800">יומן פעילות</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setFilter('today')}
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              filter === 'today'
+                ? 'bg-green-700 text-white'
+                : 'bg-slate-100 text-slate-600'
+            }`}
+          >
+            היום
+          </button>
+          <button
+            onClick={() => setFilter('all')}
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              filter === 'all'
+                ? 'bg-green-700 text-white'
+                : 'bg-slate-100 text-slate-600'
+            }`}
+          >
+            הכל
+          </button>
+        </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <table className="w-full border-collapse text-right">
-          <thead>
-            <tr className="border-b border-slate-200 bg-slate-100 text-[11px] font-black uppercase tracking-wider text-slate-500">
-              <th className="px-4 py-4">בן משפחה</th>
-              <th className="px-4 py-4">פריט</th>
-              <th className="px-4 py-4 text-center">סוכר (ג׳)</th>
-              <th className="px-4 py-4 text-center">קלוריות</th>
-              <th className="px-4 py-4 text-center">פעולות</th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-slate-100">
-            {displayEntries.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                  אין נתונים עדיין
-                </td>
+      {filtered.length === 0 ? (
+        <p className="px-5 py-8 text-center text-sm text-slate-400">
+          {filter === 'today' ? 'אין פריטים להיום עדיין' : 'אין פריטים בכלל'}
+        </p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50 text-right text-xs font-semibold text-slate-500">
+                <th className="px-4 py-3">בן משפחה</th>
+                <th className="px-4 py-3">פריט</th>
+                <th className="px-4 py-3">סוכר (ג׳)</th>
+                <th className="px-4 py-3">קלוריות</th>
+                <th className="px-4 py-3">פעולות</th>
               </tr>
-            ) : (
-              displayEntries.map((entry) => {
-                const isEditing = editingId === entry.id
-                const member =
-                members.find((m) => m.id === entry.memberId) ??
-                members.find((m) => m.name === entry.memberName)
-                return (
-                  <tr key={entry.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-semibold">
-                      {isEditing ? (
-                        <select
-                          className="rounded border border-slate-300 px-2 py-1"
-                          value={draft?.memberId ?? ''}
-                          onChange={(e) => {
-                            const selected = members.find((m) => m.id === e.target.value)
-                            if (!selected) return
-                            setDraft((prev) =>
-                              prev
-                                ? {
-                                    ...prev,
-                                    memberId: selected.id,
-                                    memberName: selected.name,
-                                  }
-                                : prev,
-                            )
-                          }}
-                        >
-                          {members.map((m) => (
-                            <option key={m.id} value={m.id}>
-                              {m.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          {member?.avatar ? (
-                            <img src={member.avatar} alt={entry.memberName} className="h-7 w-7 rounded-full object-cover" />
-                          ) : null}
-                          <span>{entry.memberName}</span>
-                        </div>
-                      )}
-                    </td>
+            </thead>
+            <tbody>
+              {filtered.map((entry) => (
+                <tr key={entry.id} className="border-b border-slate-50 hover:bg-slate-50">
+                  <td className="px-4 py-3 font-semibold">
+                    {entry.memberName}
+                  </td>
+                  <td className="px-4 py-3 text-slate-600">{entry.item}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`font-bold ${
+                        entry.sugar === 0
+                          ? 'text-green-600'
+                          : entry.sugar < 10
+                          ? 'text-amber-500'
+                          : 'text-red-500'
+                      }`}
+                    >
+                      {entry.sugar}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-slate-600">{entry.calories}</td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => deleteEntry(entry.id)}
+                      className="rounded bg-red-50 px-2 py-1 text-xs font-semibold text-red-500 hover:bg-red-100"
+                    >
+                      מחק
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-                    <td className="px-4 py-3 text-sm text-slate-600">
-                      {isEditing ? (
-                        <input
-                          className="w-40 rounded border border-slate-300 px-2 py-1"
-                          value={draft?.item ?? ''}
-                          onChange={(e) => setDraft((prev) => (prev ? { ...prev, item: e.target.value } : prev))}
-                        />
-                      ) : (
-                        entry.item
-                      )}
-                    </td>
-
-                    <td className="px-4 py-3 text-center">
-                      {isEditing ? (
-                        <input
-                          type="number"
-                          className="w-20 rounded border border-slate-300 px-2 py-1 text-center"
-                          value={draft?.sugar ?? 0}
-                          onChange={(e) =>
-                            setDraft((prev) => (prev ? { ...prev, sugar: Number(e.target.value) } : prev))
-                          }
-                        />
-                      ) : (
-                        <span
-                          className={`rounded-md px-2.5 py-1 text-sm font-bold ${
-                            entry.sugar > 10 ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'
-                          }`}
-                        >
-                          {entry.sugar}
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="px-4 py-3 text-center text-sm font-medium">
-                      {isEditing ? (
-                        <input
-                          type="number"
-                          className="w-20 rounded border border-slate-300 px-2 py-1 text-center"
-                          value={draft?.calories ?? 0}
-                          onChange={(e) =>
-                            setDraft((prev) => (prev ? { ...prev, calories: Number(e.target.value) } : prev))
-                          }
-                        />
-                      ) : (
-                        entry.calories
-                      )}
-                    </td>
-
-                    <td className="px-4 py-3 text-center">
-                      {isEditing ? (
-                        <div className="flex justify-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => saveEdit(entry.id)}
-                            className="rounded bg-green-700 px-2 py-1 text-xs text-white"
-                          >
-                            שמור
-                          </button>
-                          <button
-                            type="button"
-                            onClick={cancelEdit}
-                            className="rounded bg-slate-200 px-2 py-1 text-xs"
-                          >
-                            ביטול
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex justify-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => startEdit(entry)}
-                            className="rounded bg-slate-200 px-2 py-1 text-xs"
-                          >
-                            ערוך
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => deleteEntry(entry.id)}
-                            className="rounded bg-red-100 px-2 py-1 text-xs text-red-700"
-                          >
-                            מחק
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <p className="px-1 text-[10px] leading-relaxed text-slate-500">
+      <p className="px-5 py-2 text-xs text-slate-400 border-t border-slate-50">
         * פירות מכילים סוכר טבעי שאינו נספר במכסה המעובדת היומית.
       </p>
     </section>
