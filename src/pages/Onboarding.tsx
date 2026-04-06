@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import { useFamily } from '../contexts/FamilyContext'
 import type { Member } from '../contexts/FamilyContext'
 
+const AVATARS = Array.from({ length: 10 }, (_, i) => `/avatars/avatar-${i + 1}.png`)
+
 export default function Onboarding() {
   const navigate = useNavigate()
   const { setFamilyName, setMembers } = useFamily()
 
   const [familyNameInput, setFamilyNameInput] = useState('')
   const [memberInput, setMemberInput] = useState('')
+  const [selectedAvatar, setSelectedAvatar] = useState(AVATARS[0])
   const [draftMembers, setDraftMembers] = useState<Member[]>([])
 
   function addMember() {
@@ -20,6 +23,7 @@ export default function Onboarding() {
       {
         id: crypto.randomUUID(),
         name,
+        avatar: selectedAvatar,
       },
     ])
     setMemberInput('')
@@ -64,6 +68,25 @@ export default function Onboarding() {
         </div>
 
         <div>
+          <label className="mb-2 block text-sm font-semibold text-slate-700">בחירת אווטאר</label>
+          <div className="grid grid-cols-5 gap-2">
+            {AVATARS.map((src) => {
+              const active = selectedAvatar === src
+              return (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => setSelectedAvatar(src)}
+                  className={`overflow-hidden rounded-lg border-2 ${active ? 'border-green-700' : 'border-slate-200'}`}
+                >
+                  <img src={src} alt="avatar option" className="h-14 w-full object-cover" />
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        <div>
           <label className="mb-1 block text-sm font-semibold text-slate-700">הוספת בן משפחה</label>
           <div className="flex gap-2">
             <input
@@ -72,11 +95,7 @@ export default function Onboarding() {
               className="flex-1 rounded-lg border border-slate-300 px-3 py-2"
               placeholder="שם בן משפחה"
             />
-            <button
-              type="button"
-              onClick={addMember}
-              className="rounded-lg bg-slate-200 px-4 py-2 font-semibold"
-            >
+            <button type="button" onClick={addMember} className="rounded-lg bg-slate-200 px-4 py-2 font-semibold">
               הוסף
             </button>
           </div>
@@ -90,7 +109,10 @@ export default function Onboarding() {
             <ul className="space-y-2">
               {draftMembers.map((m) => (
                 <li key={m.id} className="flex items-center justify-between rounded-lg bg-slate-100 px-3 py-2">
-                  <span className="font-medium">{m.name}</span>
+                  <div className="flex items-center gap-2">
+                    {m.avatar ? <img src={m.avatar} alt={m.name} className="h-8 w-8 rounded-full object-cover" /> : null}
+                    <span className="font-medium">{m.name}</span>
+                  </div>
                   <button
                     type="button"
                     onClick={() => removeMember(m.id)}
