@@ -122,7 +122,7 @@ export default function Goals() {
                   <div key={m.id}>
                     <div className="flex justify-between mb-1">
                       <span className="text-sm font-bold">
-                        {m.avatar && <span className="mr-1">{m.avatar}</span>}
+                        {m.avatar && (m.avatar.startsWith("/") ? <img src={m.avatar} alt="" className="h-6 w-6 rounded-full object-cover inline-block ml-1" /> : <span className="mr-1">{m.avatar}</span>)}
                         {m.name}
                       </span>
                       <span className="text-sm font-semibold" style={{ color: mColor }}>

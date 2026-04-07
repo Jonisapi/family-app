@@ -71,7 +71,7 @@ export default function Family() {
             return (
               <div key={m.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-3xl">{m.avatar || '👤'}</span>
+                  {m.avatar?.startsWith("/") ? <img src={m.avatar} alt="" className="h-10 w-10 rounded-full object-cover" /> : <span className="text-3xl">{m.avatar || "👤"}</span>}
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-bold">{m.name}</h3>
