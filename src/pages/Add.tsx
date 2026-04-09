@@ -1,4 +1,4 @@
-﻿import { FormEvent, useMemo, useState } from 'react'
+﻿import { type FormEvent, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFamily } from '../contexts/FamilyContext'
 
@@ -26,6 +26,7 @@ export default function Add() {
   const [calories, setCalories] = useState('')
   const [loadingSuggest, setLoadingSuggest] = useState(false)
   const [confidence, setConfidence] = useState<string>('')
+  const [quantity, setQuantity] = useState('100')
   const [showMeals, setShowMeals] = useState(false)
   const [mealType, setMealType] = useState('')
   const [loadingMeals, setLoadingMeals] = useState(false)
@@ -151,6 +152,24 @@ export default function Add() {
             <button type="button" onClick={handleSuggest} disabled={loadingSuggest} className="rounded-lg bg-slate-200 px-3 py-2 text-sm font-semibold disabled:opacity-60">{loadingSuggest ? 'חושב...' : 'ערכים אוטומטיים'}</button>
           </div>
           {confidence && <p className="mt-1 text-xs text-slate-500">רמת ביטחון: {confidence}</p>}
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-semibold text-slate-700">כמות שאכלת (גרם)</label>
+          <input
+            type="number"
+            value={quantity}
+            onChange={(e) => {
+              setQuantity(e.target.value)
+              const q = Number(e.target.value)
+              const s = Number(sugar)
+              const c = Number(calories)
+              if (q && s) setSugar(String(Math.round(q * s / 100 * 10) / 10))
+              if (q && c) setCalories(String(Math.round(q * c / 100)))
+            }}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2"
+            min={1}
+          />
+          <p className="mt-1 text-xs text-slate-400">הערכים יחושבו אוטומטית לפי הכמות</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>

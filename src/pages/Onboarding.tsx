@@ -1,4 +1,4 @@
-﻿import { FormEvent, useState } from "react"
+﻿import { type FormEvent, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useFamily } from "../contexts/FamilyContext"
 import saladHero from "../assets/salad-hero.png"
