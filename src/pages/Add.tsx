@@ -39,7 +39,7 @@ export default function Add() {
     try {
       setLoadingSuggest(true)
       setConfidence('')
-      const res = await fetch('http://localhost:8787/api/nutrition/suggest', {
+      const res = await fetch('/api/suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ food }),
@@ -59,7 +59,7 @@ export default function Add() {
     setMealSuggestions([])
     try {
       const maxSugar = Math.round(dailyGoal / 3)
-      const res = await fetch('http://localhost:8787/api/meals/suggest', {
+      const res = await fetch('/api/meals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mealType: mealType || 'ארוחה כללית', maxSugar }),
