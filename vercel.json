@@ -1,6 +1,13 @@
 ﻿{
+  "functions": {
+    "api/*.js": {
+      "memory": 512,
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     { "source": "/api/nutrition/suggest", "destination": "/api/suggest" },
-    { "source": "/api/meals/suggest", "destination": "/api/meals" }
+    { "source": "/api/meals/suggest", "destination": "/api/meals" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
