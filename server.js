@@ -26,7 +26,7 @@ app.post('/api/nutrition/suggest', async (req, res) => {
     const data = JSON.parse(text)
     res.json(data)
   } catch (err) {
-    console.error(err)
+    console.error('nutrition error:', err)
     res.status(500).json({ error: 'suggestion_failed' })
   }
 })
@@ -49,9 +49,17 @@ app.post('/api/meals/suggest', async (req, res) => {
     const data = JSON.parse(cleaned)
     res.json(data)
   } catch (err) {
-    console.error(err)
+    console.error('meals error:', err)
     res.status(500).json({ error: 'meal_suggestion_failed' })
   }
 })
 
-app.listen(8787, () => console.log('API listening on http://localhost:8787'))
+const PORT = 8787
+app.listen(PORT, () => {
+  console.log(`API listening on http://localhost:${PORT}`)
+  console.log('Press Ctrl+C to stop')
+})
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err)
+})

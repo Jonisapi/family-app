@@ -60,7 +60,7 @@ export default function Index() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-2xl font-black" style={{ color: '#1a4731', lineHeight: 1 }}>{todayTotal}</span>
-                <span className="text-xs text-slate-400 mt-0.5">/ {dailyGoal}ג</span>
+                <span className="text-sm font-bold mt-0.5" style={{ color: "#64748b" }}>/ {dailyGoal}ג</span>
                 <span className="text-sm font-bold" style={{ color: ringColor }}>{pct}%</span>
               </div>
             </div>

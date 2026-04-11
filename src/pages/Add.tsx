@@ -1,6 +1,7 @@
 ﻿import { type FormEvent, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFamily } from '../contexts/FamilyContext'
+import chefIcon from '../assets/chef-icon.png'
 
 type SuggestResponse = {
   sugar_per_100g?: number
@@ -39,7 +40,8 @@ export default function Add() {
     try {
       setLoadingSuggest(true)
       setConfidence('')
-      const res = await fetch('/api/suggest', {
+      const apiBase = import.meta.env.DEV ? 'http://localhost:8787' : ''
+      const res = await fetch(`${apiBase}/api/nutrition/suggest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ food }),
@@ -59,7 +61,8 @@ export default function Add() {
     setMealSuggestions([])
     try {
       const maxSugar = Math.round(dailyGoal / 3)
-      const res = await fetch('/api/meals', {
+      const res2Base = import.meta.env.DEV ? 'http://localhost:8787' : ''
+      const res = await fetch(`${res2Base}/api/meals/suggest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mealType: mealType || 'ארוחה כללית', maxSugar }),
@@ -105,10 +108,11 @@ export default function Add() {
 
   return (
     <div dir="rtl" className="mx-auto max-w-xl p-4 pb-28">
+      <button onClick={() => navigate(-1)} className="mb-3 flex items-center gap-1 text-sm font-semibold" style={{ color: "#1a4731" }}>→ חזור</button>
       <h1 className="mb-4 text-2xl font-bold">הוספת פריט</h1>
       <div className="mb-4 rounded-xl border border-green-200 bg-green-50">
         <button type="button" onClick={() => setShowMeals(!showMeals)} className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold text-green-800">
-          <span>🤖 קבל הצעות ארוחה דלות סוכר מ-AI</span>
+          <span className="flex items-center gap-2"><img src={chefIcon} alt="" style={{ height: 28, width: 28, borderRadius: 999, objectFit: "cover" }} /> קבל הצעות ארוחה דלות סוכר מ-AI</span>
           <span>{showMeals ? '▲' : '▼'}</span>
         </button>
         {showMeals && (

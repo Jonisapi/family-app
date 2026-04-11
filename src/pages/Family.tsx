@@ -1,12 +1,57 @@
+import { useState } from "react"
 import { useFamily, useTodaySugarByMember } from '../contexts/FamilyContext'
+import { updateFamily } from '../lib/familyService'
 import BottomNav from '../components/BottomNav'
 import TopBar from '../components/TopBar'
 import { useNavigate } from 'react-router-dom'
 
 export default function Family() {
-  const { familyName, members, entries, dailyGoal } = useFamily()
+  const { familyName, members, entries, dailyGoal, familyCode } = useFamily()
   const memberStats = useTodaySugarByMember()
   const navigate = useNavigate()
+  const [newName, setNewName] = useState("")
+  const [adding, setAdding] = useState(false)
+  const [selectedAvatar, setSelectedAvatar] = useState('/avatars/avatar-1.png')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editAvatar, setEditAvatar] = useState('')
+  const [editId, setEditId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
+
+  async function addMember() {
+    if (!newName.trim() || !familyCode) return
+    setAdding(true)
+    try {
+      const newMember = { id: crypto.randomUUID(), name: newName.trim(), avatar: selectedAvatar }
+      await updateFamily(familyCode, { members: [...members, newMember] })
+      setNewName("")
+    } catch(e) {
+      console.error("addMember error:", e)
+      alert("שגיאה בהוספת בן משפחה")
+    } finally {
+      setAdding(false)
+    }
+  }
+
+  async function editMember(id: string, newName: string) {
+    if (!familyCode || !newName.trim()) return
+    const updated = members.map((m) => m.id === id ? { ...m, name: newName.trim() } : m)
+    await updateFamily(familyCode, { members: updated })
+    setEditId(null)
+  }
+
+  async function saveEdit(id: string, newAvatar: string) {
+    if (!familyCode) return
+    const updated = members.map((m) => m.id === id ? { ...m, avatar: newAvatar } : m)
+    await updateFamily(familyCode, { members: updated })
+    setEditingId(null)
+  }
+
+  async function removeMember(id: string) {
+    if (!familyCode) return
+    if (!window.confirm("האם למחוק את בן המשפחה?")) return
+    const updated = members.filter((m) => m.id !== id)
+    await updateFamily(familyCode, { members: updated })
+  }
 
   // All-time best per member (lowest daily sugar on any logged day)
   function getBestDay(memberId: string): number | null {
@@ -59,6 +104,17 @@ export default function Family() {
         </section>
 
         {/* Members */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <p className="text-xs text-slate-500 mb-1">קוד המשפחה — שתפו עם בני משפחה</p>
+          <div className="flex items-center justify-between">
+            <p className="text-3xl font-black tracking-widest" style={{ color: "#1a4731" }}>{familyCode}</p>
+            <button onClick={() => navigator.clipboard.writeText(familyCode || "")}
+              className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white" style={{ background: "#1a4731" }}>
+              העתק
+            </button>
+          </div>
+        </section>
+
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-slate-500 px-1">בני המשפחה</h2>
           {memberStats.map((m) => {
@@ -71,10 +127,56 @@ export default function Family() {
             return (
               <div key={m.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center gap-3 mb-3">
-                  {m.avatar?.startsWith("/") ? <img src={m.avatar} alt="" className="h-10 w-10 rounded-full object-cover" /> : <span className="text-3xl">{m.avatar || "👤"}</span>}
+                  <div>
+                    {editingId === m.id ? (
+                      <div>
+                        <div className="grid grid-cols-5 gap-1 mb-2">
+                          {[1,2,3,4,5,6,7,8,9,10].map((i) => (
+                            <button key={i} type="button" onClick={() => setEditAvatar(`/avatars/avatar-${i}.png`)}
+                              className="overflow-hidden rounded-lg border-2"
+                              style={{ borderColor: editAvatar === `/avatars/avatar-${i}.png` ? "#1a4731" : "#e2e8f0" }}>
+                              <img src={`/avatars/avatar-${i}.png`} alt="" className="h-10 w-full object-cover" />
+                            </button>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={() => saveEdit(m.id, editAvatar)}
+                            className="flex-1 rounded-lg py-1.5 text-xs font-bold text-white" style={{ background: "#1a4731" }}>שמור</button>
+                          <button onClick={() => setEditingId(null)}
+                            className="flex-1 rounded-lg py-1.5 text-xs font-bold text-slate-600 border border-slate-300">ביטול</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2 mt-2">
+                        <button onClick={() => { setEditingId(m.id); setEditAvatar(m.avatar || "/avatars/avatar-1.png") }}
+                          className="rounded-lg px-2 py-1 text-xs font-semibold"
+                          style={{ background: "#f0fdf4", color: "#1a4731" }}>שנה אווטאר</button>
+                        <button onClick={() => removeMember(m.id)}
+                          className="rounded-lg px-2 py-1 text-xs font-semibold"
+                          style={{ background: "#fef2f2", color: "#dc2626" }}>הסר</button>
+                      </div>
+                    )}
+                  </div>
+                  {!editingId && (m.avatar?.startsWith("/") ? <img src={m.avatar} alt="" className="h-10 w-10 rounded-full object-cover" /> : <span className="text-3xl">{m.avatar || "👤"}</span>)}
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-bold">{m.name}</h3>
+                      {editId === m.id ? (
+                      <div className="flex gap-1">
+                        <input value={editName} onChange={(e) => setEditName(e.target.value)}
+                          className="rounded-lg border border-slate-300 px-2 py-1 text-sm font-bold w-28"
+                          onKeyDown={(e) => e.key === 'Enter' && editMember(m.id, editName)} />
+                        <button onClick={() => editMember(m.id, editName)}
+                          className="rounded-lg px-2 py-1 text-xs font-bold text-white" style={{ background: "#1a4731" }}>שמור</button>
+                        <button onClick={() => setEditId(null)}
+                          className="rounded-lg px-2 py-1 text-xs font-bold text-slate-500 border border-slate-300">ביטול</button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-bold">{m.name}</h3>
+                        <button onClick={() => { setEditId(m.id); setEditName(m.name) }}
+                          className="text-xs text-slate-400 underline">עריכה</button>
+                      </div>
+                    )}
                       <span className="text-xl">{statusEmoji}</span>
                     </div>
                     <p className="text-xs text-slate-400">{total} פריטים מוזנים סה״כ</p>
@@ -111,6 +213,29 @@ export default function Family() {
           })}
         </section>
 
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="mb-3 text-sm font-semibold text-slate-500">הוספת בן משפחה</h2>
+          <div className="grid grid-cols-5 gap-1 mb-3">
+            {[1,2,3,4,5,6,7,8,9,10].map((i) => (
+              <button key={i} type="button" onClick={() => setSelectedAvatar(`/avatars/avatar-${i}.png`)}
+                className="overflow-hidden rounded-lg border-2"
+                style={{ borderColor: selectedAvatar === `/avatars/avatar-${i}.png` ? "#1a4731" : "#e2e8f0" }}>
+                <img src={`/avatars/avatar-${i}.png`} alt="" className="h-12 w-full object-cover" />
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <input value={newName} onChange={(e) => setNewName(e.target.value)}
+              placeholder="שם בן משפחה"
+              className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm"
+              onKeyDown={(e) => e.key === "Enter" && addMember()} />
+            <button onClick={addMember} disabled={adding || !newName.trim()}
+              className="rounded-xl px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
+              style={{ background: "#1a4731" }}>
+              {adding ? "..." : "הוסף"}
+            </button>
+          </div>
+        </section>
       </main>
 
       <BottomNav />
