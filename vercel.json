@@ -1,17 +1,7 @@
 ﻿{
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "functions": {
-    "api/suggest.js": {
-      "runtime": "nodejs20.x"
-    },
-    "api/meals.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
-  "routes": [
-    { "src": "/api/nutrition/suggest", "dest": "/api/suggest" },
-    { "src": "/api/meals/suggest", "dest": "/api/meals" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

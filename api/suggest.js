@@ -1,8 +1,9 @@
-﻿const OpenAI = require("openai")
+﻿export const config = { runtime: "nodejs" }
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
+  const { default: OpenAI } = await import("openai")
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" })
   
   try {
@@ -24,6 +25,6 @@ module.exports = async function handler(req, res) {
     res.json(data)
   } catch (err) {
     console.error(err)
-    res.status(500).json({ error: err.message })
+    res.status(500).json({ error: String(err) })
   }
 }
